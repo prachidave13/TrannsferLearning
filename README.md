@@ -1,4 +1,4 @@
-# Capsule — Transfer Learning for LLM Chats
+# Capsule - Transfer Learning for LLM Chats
 
 When an LLM chat dies (context overflow, hallucination, or you just want a fresh
 session), you lose all the work-in-progress state. Re-explaining wastes tokens
@@ -10,10 +10,10 @@ to speed.
 
 It captures the things naive summaries miss:
 
-- **Decision log** — *why* choices were made, not just what
-- **Dead ends** — what was tried and rejected (so the new chat doesn't redo it)
-- **Open threads** — what's in progress, what's next
-- **User preferences** — tone, stack, "don't use X"
+- **Decision log** - *why* choices were made, not just what
+- **Dead ends** - what was tried and rejected (so the new chat doesn't redo it)
+- **Open threads** - what's in progress, what's next
+- **User preferences** - tone, stack, "don't use X"
 
 **No LLM. No API keys. No external services.** The default mode is a pure
 classical-IR pipeline that picks the right sentences out of your chat and
@@ -22,7 +22,7 @@ slots them into a structured handoff.
 ## Install
 
 ```bash
-# stdlib only — no dependencies needed for the default algorithmic mode
+# stdlib only - no dependencies needed for the default algorithmic mode
 python3 -m capsule.cli build chat.md -o capsule.md
 # (or `pip install -e .` to expose the `capsule` command on $PATH)
 ```
@@ -43,8 +43,8 @@ capsule build chat.md -o capsule.md
 
 This produces:
 
-- `capsule.md` — the structured handoff
-- `resume.txt` — a one-shot prompt to paste into the new chat
+- `capsule.md` - the structured handoff
+- `resume.txt` - a one-shot prompt to paste into the new chat
 
 ### 3. Start the new chat
 
@@ -59,7 +59,7 @@ When *that* chat also fills up:
 capsule update capsule.md new_chat.md -o capsule.md
 ```
 
-The capsule evolves — that's the actual "transfer learning" loop.
+The capsule evolves - that's the actual "transfer learning" loop.
 
 ## Modes
 
@@ -90,7 +90,7 @@ chat transcript
    ▼
 [3] Build a sentence-similarity graph (cosine similarity, edge threshold).
     Run weighted PageRank (power iteration) to get a centrality score per
-    sentence — this is the TextRank algorithm (Mihalcea & Tarau, 2004).
+    sentence - this is the TextRank algorithm (Mihalcea & Tarau, 2004).
         PR(v) = (1−d)/N + d · Σ PR(u)·w(u,v)/W(u)
     →  capsule/textrank.py
    │
@@ -121,14 +121,14 @@ chat transcript
 **Why this is better than naive truncation/compression**
 
 - TF-IDF surfaces sentences with information density (rare-but-meaningful tokens).
-- TextRank captures *structural* importance — a sentence echoed by many others ranks high.
-- MMR removes redundancy — the capsule won't waste space on near-duplicate bullets.
+- TextRank captures *structural* importance - a sentence echoed by many others ranks high.
+- MMR removes redundancy - the capsule won't waste space on near-duplicate bullets.
 - The discourse router gives each sentence a *role*, so the schema slots are filled by relevant content (not just "important" content).
 
 **Trustworthy by construction**
 
 Every bullet in the capsule is a verbatim sentence from the source chat. The
-pipeline cannot invent facts — if a section is sparse, it's because the chat
+pipeline cannot invent facts - if a section is sparse, it's because the chat
 lacked that signal, not because the model hallucinated.
 
 **Limits**
@@ -139,19 +139,19 @@ lacked that signal, not because the model hallucinated.
 
 ## The Capsule Schema
 
-Every capsule has these sections — the design is the product:
+Every capsule has these sections - the design is the product:
 
-1. **Project Meta** — goal, stack, constraints, user preferences
-2. **Current State** — file tree, key symbols, what runs
-3. **Decision Log** — choices + reasoning + alternatives rejected
-4. **Dead Ends** — what failed and why (negative knowledge)
-5. **Open Threads** — in-progress task, next step, TODOs
-6. **Critical Snippets** — code the new LLM cannot infer
-7. **Resume Prompt** — ready-to-paste opener for the new chat
+1. **Project Meta** - goal, stack, constraints, user preferences
+2. **Current State** - file tree, key symbols, what runs
+3. **Decision Log** - choices + reasoning + alternatives rejected
+4. **Dead Ends** - what failed and why (negative knowledge)
+5. **Open Threads** - in-progress task, next step, TODOs
+6. **Critical Snippets** - code the new LLM cannot infer
+7. **Resume Prompt** - ready-to-paste opener for the new chat
 
 ## Why not just compress the chat?
 
-- Lossless compression (gzip) doesn't help — the tokenizer doesn't decompress.
+- Lossless compression (gzip) doesn't help - the tokenizer doesn't decompress.
 - Embeddings are lossy and need RAG infra.
 - Token tricks (abbreviations) save ~15% but the LLM burns reasoning to decode.
 
@@ -162,17 +162,17 @@ a 5000-token raw transcript.
 
 ```
 capsule/
-  segment.py    — turn-aware sentence segmentation
-  features.py   — TF-IDF + cosine similarity (stdlib)
-  textrank.py   — weighted PageRank via power iteration
-  router.py     — discourse classifier + section routing
-  mmr.py        — Maximal Marginal Relevance selection
-  render.py     — wires the pipeline; renders the 7-section schema
-  build.py      — mode dispatch (algorithmic / llm / skeleton)
-  schema.py     — the markdown schema + LLM prompts
-  extract.py    — simple regex extractor (used by skeleton mode)
-  llm.py        — OpenAI/Anthropic client (used by --llm mode only)
-  cli.py        — argparse entry point
+  segment.py    - turn-aware sentence segmentation
+  features.py   - TF-IDF + cosine similarity (stdlib)
+  textrank.py   - weighted PageRank via power iteration
+  router.py     - discourse classifier + section routing
+  mmr.py        - Maximal Marginal Relevance selection
+  render.py     - wires the pipeline; renders the 7-section schema
+  build.py      - mode dispatch (algorithmic / llm / skeleton)
+  schema.py     - the markdown schema + LLM prompts
+  extract.py    - simple regex extractor (used by skeleton mode)
+  llm.py        - OpenAI/Anthropic client (used by --llm mode only)
+  cli.py        - argparse entry point
 examples/
   sample_chat.md
 ```
